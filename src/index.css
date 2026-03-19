@@ -1,0 +1,345 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+/* ─── DESIGN TOKENS ──────────────────────────────────────────────────────── */
+:root {
+  /* Dark mode defaults — Scientific "Deep Ocean" blue palette */
+  --bg:           #040810;
+  --surface:      #080e1c;
+  --surface2:     #0d1526;
+  --surface-nav:  rgba(4,8,16,0.88);
+  --border:       rgba(255,255,255,0.07);
+  --accent:       #00c6ff;
+  --accent-blue:  #2563eb;
+  --accent-deep:  #0066cc;
+  --text:         #e8f0ff;
+  --text-muted:   rgba(200,220,255,0.58);
+  --glow-accent:  rgba(0,198,255,0.13);
+  --glow-blue:    rgba(37,99,235,0.13);
+
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  color-scheme: dark;
+}
+
+/* ─── LIGHT MODE ─────────────────────────────────────────────────────────── */
+.light {
+  --bg:           #f0f4fb;
+  --surface:      #ffffff;
+  --surface2:     #e8eff9;
+  --surface-nav:  rgba(240,244,251,0.92);
+  --border:       rgba(0,0,0,0.08);
+  --accent:       #0080b3;
+  --accent-blue:  #1d4ed8;
+  --accent-deep:  #0060a0;
+  --text:         #020408;
+  --text-muted:   rgba(6,13,28,0.85);
+  --glow-accent:  rgba(0,128,179,0.09);
+  --glow-blue:    rgba(29,78,216,0.09);
+
+  color-scheme: light;
+}
+
+/* ─── TAILWIND THEME MAPPING ─────────────────────────────────────────────── */
+@theme {
+  --color-background:  var(--bg);
+  --color-surface:     var(--surface);
+  --color-accent:      var(--accent);
+  --color-accent-blue: var(--accent-blue);
+  --color-secondary:   var(--text-muted);
+}
+
+/* ─── BASE ───────────────────────────────────────────────────────────────── */
+html { scroll-behavior: auto; }
+
+body {
+  background-color: transparent; /* Allow the underlying background gradient/color to show through */
+  color: var(--text);
+  font-family: var(--font-body);
+  font-feature-settings: "cv11","ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  color: var(--text);
+  transition: color 0.35s ease;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--accent);
+  color: #000;
+}
+
+/* ─── SCROLLBAR ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 5px; }
+::-webkit-scrollbar-track  { background: var(--bg); }
+::-webkit-scrollbar-thumb  {
+  background: rgba(0,198,255,0.15);
+  border-radius: 3px;
+}
+.light ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); }
+::-webkit-scrollbar-thumb:hover  { background: var(--accent); }
+
+/* ─── FOCUS ──────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ─── NAV LINK HOVER (theme-aware) ──────────────────────────────────────── */
+.nav-link:hover { color: var(--text) !important; }
+.nav-link { transition: color 0.2s; }
+
+/* ─── LIGHT MODE CARD FIXES ──────────────────────────────────────────────── */
+.light .glass-card {
+  background: rgba(255,255,255,0.82) !important;
+  border-color: rgba(0,0,0,0.07) !important;
+}
+.light .input-field {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: #060d1c !important;
+}
+.light .input-field::placeholder { color: rgba(0,0,0,0.45) !important; }
+.light .canvas-bg { opacity: 0.12 !important; }
+
+/* ─── LIGHT MODE AUTH CARD ───────────────────────────────────────────────── */
+.light .auth-card {
+  background: rgba(255,255,255,0.92) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+}
+.light .auth-input {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: #060d1c !important;
+}
+.light .auth-divider-bg {
+  background: rgba(240,244,251,0.95) !important;
+}
+
+/* ─── TOAST NOTIFICATION ─────────────────────────────────────────────────── */
+@keyframes slideUp {
+  from { opacity:0; transform: translateY(10px) scale(0.96); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+@keyframes slideDown {
+  from { opacity:1; transform: translateY(0) scale(1); }
+  to   { opacity:0; transform: translateY(10px) scale(0.96); }
+}
+.toast-in  { animation: slideUp   0.28s cubic-bezier(0.16,1,0.3,1) forwards; }
+.toast-out { animation: slideDown 0.22s ease forwards; }
+
+/* ─── GRADIENT TEXT ──────────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── VIDEO OVERLAY ──────────────────────────────────────────────────────── */
+.video-overlay {
+  background: linear-gradient(to top,
+    var(--bg) 0%,
+    rgba(4,8,16,0.55) 50%,
+    rgba(4,8,16,0.2) 100%
+  );
+}
+.light .video-overlay {
+  background: linear-gradient(to top,
+    var(--bg) 0%,
+    rgba(240,244,251,0.55) 50%,
+    rgba(240,244,251,0.2) 100%
+  );
+}
+
+/* ─── BENCH BAR ──────────────────────────────────────────────────────────── */
+.bench-bar {
+  background: rgba(255,255,255,0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.light .bench-bar { background: rgba(0,0,0,0.06); }
+
+/* ─── STEP LINE ──────────────────────────────────────────────────────────── */
+.step-line {
+  border-left: 1px solid rgba(0,198,255,0.15);
+}
+.light .step-line { border-left-color: rgba(0,128,179,0.15); }
+
+/* ─── THEME TOGGLE ───────────────────────────────────────────────────────── */
+.theme-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.theme-pill:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+/* ─── STICKY STEP ACTIVE ─────────────────────────────────────────────────── */
+.step-item-active .step-dot {
+  box-shadow: 0 0 20px var(--accent), 0 0 40px rgba(0,198,255,0.3);
+}
+
+/* ─── SUBTLE GRID OVERLAY ────────────────────────────────────────────────── */
+.grid-overlay {
+  background-image:
+    linear-gradient(rgba(0,198,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,198,255,0.035) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 50%, black 10%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 50%, black 10%, transparent 100%);
+}
+
+/* ─── GLASSMORPHIC PANEL ─────────────────────────────────────────────────── */
+/* Replaces border-heavy bento boxes with layered depth */
+.glass-panel {
+  background: rgba(8, 14, 28, 0.55);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow:
+    0 0 0 1px rgba(0,198,255,0.07) inset,
+    0 40px 100px rgba(0,0,0,0.55),
+    0 1px 0 rgba(0,198,255,0.05) inset;
+  border-radius: 24px;
+}
+.light .glass-panel {
+  background: rgba(255,255,255,0.72);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.055) inset,
+    0 20px 60px rgba(0,0,0,0.07),
+    0 2px 0 rgba(255,255,255,0.9) inset;
+}
+
+/* ─── CINEMATIC FEATURE CARD ─────────────────────────────────────────────── */
+.feature-card {
+  background: linear-gradient(135deg,
+    rgba(0,198,255,0.06) 0%,
+    rgba(37,99,235,0.09) 100%
+  );
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow:
+    0 0 0 1px rgba(0,198,255,0.12) inset,
+    0 60px 120px rgba(0,0,0,0.65),
+    0 0 80px rgba(0,198,255,0.04) inset;
+  border-radius: 28px;
+}
+.light .feature-card {
+  background: linear-gradient(135deg,
+    rgba(0,128,179,0.06) 0%,
+    rgba(29,78,216,0.08) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(0,128,179,0.12) inset,
+    0 30px 80px rgba(0,0,0,0.09);
+}
+
+/* ─── DEEP GLOW SHADOW UTILITIES ─────────────────────────────────────────── */
+.glow-accent {
+  box-shadow: 0 0 60px rgba(0,198,255,0.18), 0 0 120px rgba(0,198,255,0.06);
+}
+.glow-card {
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,198,255,0.06) inset;
+}
+
+/* ─── SECTION LABEL ──────────────────────────────────────────────────────── */
+.section-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ─── LARGE DISPLAY HEADING ──────────────────────────────────────────────── */
+.heading-display {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  color: var(--text);
+}
+
+/* ─── SCROLL FADE STEP ───────────────────────────────────────────────────── */
+.step-inactive {
+  pointer-events: none;
+}
+
+/* ─── ASYMMETRIC BENTO GRID ──────────────────────────────────────────────── */
+.bento-grid {
+  display: grid;
+  gap: 20px;
+}
+.bento-feature { grid-area: feature; }
+.bento-a       { grid-area: a; }
+.bento-b       { grid-area: b; }
+.bento-c       { grid-area: c; }
+
+@media (min-width: 768px) {
+  .bento-eval {
+    grid-template-areas:
+      "feature feature a"
+      "b c c";
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .bento-ai {
+    grid-template-areas:
+      "feature feature feature"
+      "a a b";
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+}
+
+/* ─── GLOBAL CINEMATIC NOISE ─────────────────────────────────────────────── */
+.global-noise {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998; /* Sits just below the loading screen */
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+.light .global-noise {
+  opacity: 0.03;
+  mix-blend-mode: multiply;
+}
+
+/* ─── PRICING GRID RESPONSIVE ────────────────────────────────────────────── */
+.pricing-grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+@media (max-width: 1100px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 768px) {
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
