@@ -1,7 +1,7 @@
 // src/PricingSection.jsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Loader2, Zap, CreditCard } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Loader2, Zap, CreditCard, Shield, Undo2, History, Activity } from 'lucide-react';
 import { useToast } from './ToastContext';
 
 const EASE_EXPO = [0.16, 1, 0.3, 1];
@@ -111,7 +111,7 @@ const PricingCard = ({ plan, isSubscribed }) => {
     border: plan.highlighted
       ? '2px dashed rgba(251,146,60,0.7)'
       : '1px solid rgba(0,198,255,0.22)',
-    borderRadius: 6,
+    borderRadius: 24,
     padding: '24px 20px 20px',
     backdropFilter: 'blur(14px)',
     WebkitBackdropFilter: 'blur(14px)',
@@ -154,7 +154,7 @@ const PricingCard = ({ plan, isSubscribed }) => {
             boxShadow: '0 4px 18px rgba(251,146,60,0.45)',
           }}
         >
-          ⭐ Most Popular
+          Most Popular
         </div>
       )}
 
@@ -399,7 +399,7 @@ const PricingSection = () => {
 
   return (
   <section
-    id="subscription"
+    id="pricing"
     style={{ padding: '80px 0 100px', position: 'relative', overflow: 'hidden' }}
   >
     {/* Ambient glow */}
@@ -513,23 +513,27 @@ const PricingSection = () => {
         }}
       >
         {[
-          { icon: '🔒', text: 'Secured by Stripe' },
-          { icon: '↩️', text: 'Cancel anytime' },
-          { icon: '🧾', text: 'Instant receipts' },
-          { icon: '🛡️', text: 'PCI compliant' },
+          { icon: <Shield size={16} />, text: 'Secured by Stripe' },
+          { icon: <Undo2 size={16} />,  text: 'Cancel anytime' },
+          { icon: <History size={16} />, text: 'Instant receipts' },
+          { icon: <Activity size={16} />, text: 'PCI compliant' },
         ].map(({ icon, text }) => (
           <div
             key={text}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 7,
+              gap: 9,
               color: 'var(--text-muted)',
               fontSize: '0.82rem',
               fontFamily: 'var(--font-body)',
+              background: 'rgba(255,255,255,0.03)',
+              padding: '6px 14px',
+              borderRadius: '99px',
+              border: '1px solid var(--border)'
             }}
           >
-            <span style={{ fontSize: '1rem' }}>{icon}</span>
+            <span style={{ color: 'var(--accent)' }}>{icon}</span>
             {text}
           </div>
         ))}

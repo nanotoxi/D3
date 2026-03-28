@@ -23,23 +23,7 @@
   color-scheme: dark;
 }
 
-/* ─── LIGHT MODE ─────────────────────────────────────────────────────────── */
-.light {
-  --bg:           #f0f4fb;
-  --surface:      #ffffff;
-  --surface2:     #e8eff9;
-  --surface-nav:  rgba(240,244,251,0.92);
-  --border:       rgba(0,0,0,0.08);
-  --accent:       #0080b3;
-  --accent-blue:  #1d4ed8;
-  --accent-deep:  #0060a0;
-  --text:         #020408;
-  --text-muted:   rgba(6,13,28,0.85);
-  --glow-accent:  rgba(0,128,179,0.09);
-  --glow-blue:    rgba(29,78,216,0.09);
-
-  color-scheme: light;
-}
+/* Light mode CSS vars removed — the platform is strictly dark theme only as per 2025 branding update. */
 
 /* ─── TAILWIND THEME MAPPING ─────────────────────────────────────────────── */
 @theme {
@@ -96,32 +80,9 @@ h1,h2,h3,h4,h5,h6 {
 .nav-link:hover { color: var(--text) !important; }
 .nav-link { transition: color 0.2s; }
 
-/* ─── LIGHT MODE CARD FIXES ──────────────────────────────────────────────── */
-.light .glass-card {
-  background: rgba(255,255,255,0.82) !important;
-  border-color: rgba(0,0,0,0.07) !important;
-}
-.light .input-field {
-  background: rgba(0,0,0,0.04) !important;
-  border-color: rgba(0,0,0,0.1) !important;
-  color: #060d1c !important;
-}
-.light .input-field::placeholder { color: rgba(0,0,0,0.45) !important; }
-.light .canvas-bg { opacity: 0.12 !important; }
+/* Light mode support removed */
 
-/* ─── LIGHT MODE AUTH CARD ───────────────────────────────────────────────── */
-.light .auth-card {
-  background: rgba(255,255,255,0.92) !important;
-  border-color: rgba(0,0,0,0.08) !important;
-}
-.light .auth-input {
-  background: rgba(0,0,0,0.04) !important;
-  border-color: rgba(0,0,0,0.1) !important;
-  color: #060d1c !important;
-}
-.light .auth-divider-bg {
-  background: rgba(240,244,251,0.95) !important;
-}
+/* Light mode support removed */
 
 /* ─── TOAST NOTIFICATION ─────────────────────────────────────────────────── */
 @keyframes slideUp {
@@ -343,3 +304,37 @@ h1,h2,h3,h4,h5,h6 {
     gap: 16px !important;
   }
 }
+
+/* ─── SCROLLING UNIVERSITY TICKER ───────────────────────────────────────── */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-container {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+
+.ticker-content {
+  display: flex;
+  flex-shrink: 0;
+  min-width: 100%;
+  animation: ticker 40s linear infinite;
+}
+
+.ticker-item {
+  flex-shrink: 0;
+  padding: 0 4rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

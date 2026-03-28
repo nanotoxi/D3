@@ -320,7 +320,7 @@ const STATS = [
 
 const FAQS = [
   { q:"Who's building Nanotoxi?", a:"We are a team of researchers, AI engineers, and toxicologists dedicated to accelerating nanoparticle safety assessment through advanced machine learning models." },
-  { q:"Can we integrate Nanotoxi?", a:"Yes. You can access our prediction pipeline via our API at https://web-production-6a673.up.railway.app, or reach out to contact@nanotoxi.com for enterprise integrations." },
+  { q:"Can we integrate Nanotoxi?", a:"Yes. You can access our prediction pipeline via our enterprise API, or reach out to contact@nanotoxi.com for integration documentation." },
   { q:"What is your business model?", a:"We provide API access for high-throughput screening and enterprise licensing for labs and institutions that need custom model fine-tuning for specific nanomaterials." },
   { q:"Where does data come from?", a:"Our models are trained on 14,791+ nanoparticle samples aggregated from peer-reviewed literature and experimental databases with rigorous curation." },
   { q:"Who validates predictions?", a:"Complex cases and framework updates are reviewed by domain experts in nanotechnology and computational toxicology." },
@@ -402,7 +402,7 @@ const ThemeToggle = () => {
 };
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
-const NAV_LINKS = ['Home', 'Benchmarks', 'Subscription', 'FAQ', 'Contact'];
+const NAV_LINKS = ['Home', 'Benchmarks', 'Pricing', 'FAQ', 'Contact'];
 
 const Navbar = () => {
   const [open, setOpen]       = useState(false);
@@ -457,7 +457,6 @@ const Navbar = () => {
         </a>
         <nav className="hidden md:flex items-center gap-7 text-sm font-medium">
           {NAV_LINKS.map(renderLink)}
-          <ThemeToggle />
           {user ? (
             <div className="flex items-center gap-4">
               <Link to="/settings/billing" className="nav-link text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>
@@ -480,7 +479,6 @@ const Navbar = () => {
           )}
         </nav>
         <div className="md:hidden flex items-center gap-3">
-          <ThemeToggle />
           <button onClick={() => setOpen(!open)} style={{ color: 'var(--text)' }}>
             {open ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -1176,7 +1174,6 @@ const Contact = () => {
             <div className="space-y-3">
               {[
                 { label: 'Email', value: 'contact@nanotoxi.com' },
-                { label: 'API',   value: 'web-production-6a673.up.railway.app' },
                 { label: 'Demo',  value: 'calendly.com/nanotoxi/demo' },
               ].map(item => (
                 <div key={item.label}
@@ -1246,24 +1243,33 @@ const DemoWidget = () => {
   const [form, setForm]       = useState(DEMO_DEFAULTS);
   const [result, setResult]   = useState(null);
   const [loading, setLoading] = useState(false);
+  const [zetaEnabled, setZetaEnabled] = useState(false); // Zeta potential is optional
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handlePredict = async () => {
     setLoading(true); setResult(null);
     try {
+      const payload = {
+        nanoparticle_type: form.nanoparticleType,
+        size: Number(form.size),
+        surface_area: Number(form.surfaceArea), 
+        dosage: Number(form.dosage),
+        exposure_time: Number(form.exposureTime), 
+        coating: form.coating,
+      };
+      
+      if (zetaEnabled) {
+        payload.zeta_potential = Number(form.zetaPotential);
+      }
+
       const res = await fetch('https://web-production-6a673.up.railway.app/predict', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nanoparticle_type: form.nanoparticleType,
-          size: Number(form.size), zeta_potential: Number(form.zetaPotential),
-          surface_area: Number(form.surfaceArea), dosage: Number(form.dosage),
-          exposure_time: Number(form.exposureTime), coating: form.coating,
-        }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
       setResult(await res.json());
     } catch {
-      const toxic = form.size < 20 || form.zetaPotential > 10 || form.dosage > 200;
+      const toxic = form.size < 20 || (zetaEnabled && form.zetaPotential > 10) || form.dosage > 200;
       setResult({
         prediction: toxic ? 'TOXIC' : 'NON-TOXIC',
         confidence: toxic ? (0.82 + Math.random() * 0.13).toFixed(3) : (0.87 + Math.random() * 0.11).toFixed(3),
@@ -1349,7 +1355,45 @@ const DemoWidget = () => {
 
               {[
                 { k: 'size',         label: 'Size (nm)',             min: 1,   max: 500, unit: 'nm'     },
-                { k: 'zetaPotential',label: 'Zeta Potential (mV)',   min: -80, max: 80,  unit: 'mV'     },
+              ].map(({ k, label, min, max, unit }) => (
+                <div key={k}>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{label}</label>
+                    <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>{form[k]} {unit}</span>
+                  </div>
+                  <input type="range" min={min} max={max} value={form[k]}
+                    onChange={e => set(k, e.target.value)}
+                    className="w-full" style={{ accentColor: 'var(--accent)' }} />
+                </div>
+              ))}
+
+              {/* Zeta Potential Optional Toggle */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                   <div className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        id="zeta-toggle"
+                        checked={zetaEnabled} 
+                        onChange={() => setZetaEnabled(!zetaEnabled)}
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" 
+                      />
+                      <label htmlFor="zeta-toggle" className="text-xs font-semibold uppercase tracking-wider cursor-pointer" style={{ color: 'var(--text-muted)' }}>
+                        Zeta Potential (mV)
+                      </label>
+                   </div>
+                   {zetaEnabled && <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>{form.zetaPotential} mV</span>}
+                </div>
+                {zetaEnabled ? (
+                   <input type="range" min={-80} max={80} value={form.zetaPotential}
+                     onChange={e => set('zetaPotential', e.target.value)}
+                     className="w-full" style={{ accentColor: 'var(--accent)' }} />
+                ) : (
+                   <div className="py-2 text-[10px] text-slate-500 italic">Optional field disabled. Using baseline defaults in ML pipeline.</div>
+                )}
+              </div>
+
+              {[
                 { k: 'dosage',       label: 'Dosage (μg/mL)',        min: 1,   max: 500, unit: 'μg/mL'  },
                 { k: 'exposureTime', label: 'Exposure Time (h)',      min: 1,   max: 96,  unit: 'h'      },
               ].map(({ k, label, min, max, unit }) => (
@@ -1472,12 +1516,10 @@ const DemoWidget = () => {
                         </div>
                       </div>
                     )}
-                    {result._simulated && (
-                      <p className="text-xs px-3 py-2 rounded-xl"
+                       <p className="text-xs px-3 py-2 rounded-xl"
                         style={{ background: 'var(--surface2)', color: 'var(--text-muted)' }}>
-                        ⚡ API offline — showing simulated prediction based on input heuristics.
+                        API offline — showing simulated prediction based on input heuristics.
                       </p>
-                    )}
                     <div className="flex gap-3">
                       <motion.button onClick={() => alert("Generate PDF Report - functionality coming soon")}
                         whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={SPRING_FAST}
@@ -1541,10 +1583,10 @@ const CTASection = () => (
             Schedule Demo <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </MagneticButton>
 
-          <MagneticButton href="https://web-production-6a673.up.railway.app"
+          <MagneticButton to="/signup"
             className="px-10 py-4 rounded-2xl font-bold text-base"
             style={{ color: 'var(--text)', background: 'rgba(0,198,255,0.05)', boxShadow: '0 0 0 1px rgba(0,198,255,0.14) inset' }}>
-            Try API Free <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" style={{ color: 'var(--text-muted)' }} />
+            Get Started <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" style={{ color: 'var(--text-muted)' }} />
           </MagneticButton>
 
         </motion.div>
@@ -1552,6 +1594,45 @@ const CTASection = () => (
     </div>
   </section>
 );
+
+// ─── TRUSTED BY ─────────────────────────────────────────────────────────────
+const TrustedBy = () => {
+  const universities = [
+    "Mumbai University",
+    "Symbiosis International University",
+    "Mumbai University",
+    "Symbiosis International University",
+    "Mumbai University",
+    "Symbiosis International University",
+    "Mumbai University",
+    "Symbiosis International University",
+  ];
+  
+  return (
+    <div className="py-20 border-t border-b overflow-hidden" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+      <div className="container mx-auto px-6 mb-10 text-center">
+        <span className="section-eyebrow">Academic Partners & Verification</span>
+      </div>
+      <div className="ticker-container">
+        <div className="ticker-content">
+          {universities.map((uni, i) => (
+            <div key={i} className="ticker-item">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
+              {uni}
+            </div>
+          ))}
+          {/* Repeat for seamless loop */}
+          {universities.map((uni, i) => (
+            <div key={`dup-${i}`} className="ticker-item">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
+              {uni}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // ─── FOOTER ───────────────────────────────────────────────────────────────────
 const Footer = () => {
@@ -1595,6 +1676,7 @@ const LandingPage = () => (
     <Contact />
     <DemoWidget />
     <CTASection />
+    <TrustedBy />
     <Footer />
   </div>
 );

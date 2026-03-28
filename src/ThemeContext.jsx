@@ -1,23 +1,18 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 
-export const ThemeContext = createContext({ theme: 'dark', toggleTheme: () => {} });
+export const ThemeContext = createContext({ theme: 'dark' });
 export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    try { return localStorage.getItem('nanotoxi-theme') || 'dark'; } catch { return 'dark'; }
-  });
-
   useEffect(() => {
-    document.documentElement.classList.toggle('light', theme === 'light');
-    try { localStorage.setItem('nanotoxi-theme', theme); } catch {}
-  }, [theme]);
-
-  const toggleTheme = useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), []);
+    document.documentElement.classList.remove('light');
+    document.documentElement.classList.add('dark');
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme: 'dark' }}>
       {children}
     </ThemeContext.Provider>
   );
 };
+
