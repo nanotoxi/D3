@@ -107,12 +107,20 @@ const Signup = () => {
       const data = await res.json();
       
       if (res.ok) {
-        showToast('Account created successfully!', 'success');
-        // Now using our useAuth hook (already imported in prev edit)
-        // Note: Sign up already sets cookie on backend
-        window.location.href = '/'; 
+        showToast('Account created! Logging you in...', 'success');
+        const loginRes = await fetch(\/api/v1/auth/login\, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailVal, password: passVal }),
+        });
+        if (loginRes.ok) {
+          const loginData = await loginRes.json();
+          localStorage.setItem('nanotoxi_token', loginData.access_token);
+          localStorage.setItem('nanotoxi_refresh', loginData.refresh_token);
+        }
+        window.location.href = '/';
       } else {
-        showToast(data.error || 'Signup failed. Please try again.', 'error');
+        showToast(data.detail || data.error || 'Signup failed. Please try again.', 'error');
       }
     } catch (err) {
       showToast('Connection to auth server failed.', 'error');
