@@ -77,17 +77,27 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 async function startStripeCheckout(setPending, showToast, planId) {
   setPending(true);
   try {
-    const res = await fetch(`${BACKEND_URL}/api/checkout`, {
+    const token = localStorage.getItem('nanotoxi_token');
+    if (!token) {
+      // Not logged in — redirect to sign up first
+      window.location.href = '/signup';
+      return;
+    }
+    const res = await fetch(`${BACKEND_URL}/api/v1/stripe/checkout`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ planId }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ plan_id: planId }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || `Server error: ${res.status}`);
-    
-    // Redirect to Stripe checkout page
-    window.location.href = data.url;
+    if (!res.ok) throw new Error(data.detail || data.error || `Server error: ${res.status}`);
+    if (data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      throw new Error('No checkout URL returned');
+    }
   } catch (err) {
     console.error('Stripe checkout error:', err);
     if (showToast) {
