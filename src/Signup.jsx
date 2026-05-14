@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, ArrowRight, Loader2, Check } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTheme } from './ThemeContext';
 import { useToast } from './ToastContext';
 
@@ -74,6 +74,7 @@ const Signup = () => {
   const { showToast } = useToast();
   const { theme } = useTheme(); // <-- ADDED THEME HERE
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const strength = getStrength(password);
 
@@ -117,6 +118,18 @@ const Signup = () => {
           const loginData = await loginRes.json();
           localStorage.setItem('nanotoxi_token', loginData.access_token);
           localStorage.setItem('nanotoxi_refresh', loginData.refresh_token);
+          const planId = searchParams.get('plan');
+          if (planId) {
+            try {
+              const cr = await fetch(`${BACKEND_URL}/api/v1/stripe/checkout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${loginData.access_token}` },
+                body: JSON.stringify({ plan_id: planId }),
+              });
+              const cd = await cr.json();
+              if (cr.ok && cd.checkout_url) { window.location.href = cd.checkout_url; return; }
+            } catch {}
+          }
         }
         window.location.href = '/';
       } else {
@@ -267,7 +280,7 @@ const Signup = () => {
           <div className="text-center mt-7 pt-6 border-t relative z-10" style={{borderColor:'var(--border)'}}>
             <p className="text-sm" style={{color:'var(--text-muted)'}}>
               Already have an account?{' '}
-              <Link to="/login" className="font-semibold hover:opacity-80 transition-opacity" style={{color:'var(--accent)'}}>Log in</Link>
+              <Link to={searchParams.get('plan') ? `/login?plan=${searchParams.get('plan')}` : '/login'} className="font-semibold hover:opacity-80 transition-opacity" style={{color:'var(--accent)'}}>Log in</Link>
             </p>
           </div>
         </div>
