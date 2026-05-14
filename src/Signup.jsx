@@ -108,7 +108,7 @@ const Signup = () => {
       
       if (res.ok) {
         showToast('Account created! Logging you in...', 'success');
-        const loginRes = await fetch(\/api/v1/auth/login\, {
+        const loginRes = await fetch(, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: emailVal, password: passVal }),
