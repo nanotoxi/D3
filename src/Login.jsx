@@ -100,19 +100,20 @@ const Login = () => {
     const passVal = e.target.password.value;
     
     try {
-      const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+      const res = await fetch(`${BACKEND_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ email: emailVal, password: passVal }),
       });
       const data = await res.json();
       if (res.ok) {
+        localStorage.setItem('nanotoxi_token', data.access_token);
+        localStorage.setItem('nanotoxi_refresh', data.refresh_token);
         showToast('Logged in successfully!', 'success');
         await checkAuth();
         navigate('/');
       } else {
-        showToast(data.error || 'Login failed.', 'error');
+        showToast(data.detail || data.error || 'Invalid email or password.', 'error');
       }
     } catch (err) {
       showToast('Login failed. Please check your connection.', 'error');
