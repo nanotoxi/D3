@@ -28,7 +28,10 @@ const BillingPage = () => {
 
   const fetchBilling = async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/api/billing`, { credentials: 'include' });
+      const token = localStorage.getItem('nanotoxi_token');
+    const res = await fetch(`${BACKEND_URL}/api/v1/billing`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
       const data = await res.json();
       setBillingData(data);
     } catch (err) {
@@ -53,7 +56,10 @@ const BillingPage = () => {
 
   const handleSuccess = async (sessionId) => {
     try {
-      await fetch(`${BACKEND_URL}/api/checkout/success?session_id=${sessionId}`, { credentials: 'include' });
+      const _tok = localStorage.getItem('nanotoxi_token');
+      await fetch(`${BACKEND_URL}/api/v1/stripe/checkout/success?session_id=${sessionId}`, {
+        headers: _tok ? { Authorization: `Bearer ${_tok}` } : {},
+      });
       showToast('Subscription activated! Redirecting to your dashboard…', 'success');
       fetchBilling();
       checkAuth();
@@ -70,11 +76,11 @@ const BillingPage = () => {
     if (!window.confirm('Are you sure you want to cancel? You will keep access until the end of the period.')) return;
     setActionPending(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/billing/cancel`, {
+      const _t1 = localStorage.getItem('nanotoxi_token');
+      const res = await fetch(`${BACKEND_URL}/api/v1/billing/cancel`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ subscriptionId: billingData.subscription.id }),
+        headers: { 'Content-Type': 'application/json', ...(_t1 ? { Authorization: `Bearer ${_t1}` } : {}) },
+        body: JSON.stringify({ subscription_id: billingData.subscription?.id }),
       });
       if (res.ok) {
         showToast('Subscription scheduled for cancellation', 'info');
@@ -90,9 +96,10 @@ const BillingPage = () => {
   const resumeSubscription = async () => {
     setActionPending(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/billing/resume`, {
+      const _t2 = localStorage.getItem('nanotoxi_token');
+      const res = await fetch(`${BACKEND_URL}/api/v1/billing/resume`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(_t2 ? { Authorization: `Bearer ${_t2}` } : {}) },
         credentials: 'include',
         body: JSON.stringify({ subscriptionId: billingData.subscription.id }),
       });
