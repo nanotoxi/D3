@@ -80,7 +80,7 @@ async function startStripeCheckout(setPending, showToast, planId) {
     const token = localStorage.getItem('nanotoxi_token');
     if (!token) {
       // Not logged in — redirect to sign up first
-      window.location.href = '/signup';
+      window.location.href = '/signup?plan=' + planId;
       return;
     }
     const res = await fetch(`${BACKEND_URL}/api/v1/stripe/checkout`, {
