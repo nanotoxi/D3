@@ -111,6 +111,20 @@ const Login = () => {
         localStorage.setItem('nanotoxi_refresh', data.refresh_token);
         showToast('Logged in successfully!', 'success');
         await checkAuth();
+        // If redirected here from pricing, auto-trigger checkout
+        const _params = new URLSearchParams(window.location.search);
+        const _plan = _params.get('plan');
+        if (_plan) {
+          try {
+            const _cr = await fetch(`${BACKEND_URL}/api/v1/stripe/checkout`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${data.access_token}` },
+              body: JSON.stringify({ plan_id: _plan }),
+            });
+            const _cd = await _cr.json();
+            if (_cr.ok && _cd.checkout_url) { window.location.href = _cd.checkout_url; return; }
+          } catch {}
+        }
         navigate('/');
       } else {
         showToast(data.detail || data.error || 'Invalid email or password.', 'error');
